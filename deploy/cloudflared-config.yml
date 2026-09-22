@@ -1,0 +1,23 @@
+# Konfigurasi Cloudflare Tunnel untuk TKJ Learning.
+# Salin ke /etc/cloudflared/config.yml setelah menjalankan `cloudflared tunnel create tkj`.
+#
+# Ganti <TUNNEL_ID> dengan id yang dicetak perintah create, dan sesuaikan domain.
+
+tunnel: <TUNNEL_ID>
+credentials-file: /etc/cloudflared/<TUNNEL_ID>.json
+
+# Buffer unggahan materi 50 MB tidak perlu disetel khusus; batas Cloudflare
+# pada paket gratis adalah 100 MB per permintaan.
+ingress:
+  - hostname: tkj.sekolah.sch.id
+    service: http://127.0.0.1:80
+    originRequest:
+      # Nama host diteruskan apa adanya supaya server_name nginx cocok.
+      httpHostHeader: tkj.sekolah.sch.id
+      # Export Excel dan unggah materi besar butuh waktu lebih dari bawaan 30 detik.
+      connectTimeout: 30s
+      # Batas waktu menunggu respons dari nginx.
+      noTLSVerify: false
+
+  # Wajib ada sebagai penutup: semua permintaan lain ditolak.
+  - service: http_status:404
